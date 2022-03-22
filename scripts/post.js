@@ -122,7 +122,6 @@ function getAccountInfo() {
             accountBalance = parseFloat(sanitisedResponse.data.balance);
             document.getElementById("accountBalance").innerHTML = "<b>Current balance</b>: " + sanitisedResponse.data.balance + " " + sanitisedResponse.data.currency;
             currencyCode = sanitisedResponse.data.currency;
-            getPhoneNumberLength();
             startPhoneNumberCheck();
         } else {
             document.getElementById("accountBalance").innerHTML = "<b>Error</b>: Unable to get account information. Please check your API key and try again.";
