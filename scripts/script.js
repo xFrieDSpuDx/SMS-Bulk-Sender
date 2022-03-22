@@ -153,6 +153,10 @@ function sendSuccess(response) {
     const sanitisedResponse = JSON.parse(response);
     const successNumber = sanitisedResponse.data.to[0].phone_number;
 
+    if (sanitisedResponse.data.cost.amount === null) {
+        return;
+    }
+    
     sendCost += parseFloat(sanitisedResponse.data.cost.amount);
     successArray.push(successNumber);
 }
