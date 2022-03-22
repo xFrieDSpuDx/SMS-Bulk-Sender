@@ -102,16 +102,16 @@ function onDragLeaveHandler(event) {
     If possible fix any possible errors in the country code before trying to send
 */
 function fixCountryCode(sanitisedNumbers) {
-    if (numberLength.code === false) {
-        return sanitisedNumbers;
-    }
-
-    const countryCodeLength = String(numberLength.code).length;
+    const countryCodeLength = String(internationalCode).length;
     let countryCodeCorrected = [];
 
     for (let index = 0; index < sanitisedNumbers.length; index++) {
-        if (sanitisedNumbers[index].substring(0, countryCodeLength) !== String(numberLength.code)) {
-            countryCodeCorrected.push("+" + numberLength.code + sanitisedNumbers[index].substring(1));
+        if (sanitisedNumbers[index].substring(0, countryCodeLength - 1) !== String(internationalCode.substring(1))) {
+            if (sanitisedNumbers[index].length < 10) {
+                countryCodeCorrected.push(internationalCode + sanitisedNumbers[index]);
+            } else {
+                countryCodeCorrected.push(internationalCode + sanitisedNumbers[index].slice(sanitisedNumbers[index].length - 10));
+            }
         } else {
             countryCodeCorrected.push("+" + sanitisedNumbers[index]);
         }
@@ -133,7 +133,7 @@ function cleanNumbersReturnArray(numberInput) {
     sanitisedNumbers = sanitisedNumbers.split(/[ +\n,]+/);
     sanitisedNumbers = fixCountryCode(sanitisedNumbers);
 
-    sanitisedNumbers = sanitisedNumbers.filter(arrayValue => arrayValue !== "+" + String(numberLength.code));
+    sanitisedNumbers = sanitisedNumbers.filter(arrayValue => arrayValue !== String(internationalCode));
     sanitisedNumbers = sanitisedNumbers.filter(arrayValue => arrayValue);
 
     return sanitisedNumbers;
@@ -160,10 +160,15 @@ function checkForNumberErrors(numberArray) {
 */
 function checkNumberLength(numberArray) {
     let possibleErrors = [];
-    const expectedLengths = getPhoneNumberLength();
+    const codeLength = internationalCode.length;
+
+    if (codeLength === 0) {
+        document.getElementById("sendErrors").innerHTML = "Error: Populate the Telnyx Mobile Number to allow error checking on the phone number list.";
+        return;
+    }
 
     for (let index = 0; index < numberArray.length; index++) {
-        if (numberArray[index].length < expectedLengths.minimum + 1 || numberArray[index].length > expectedLengths.maximum + 1) {
+        if (numberArray[index].length < 10 + codeLength || numberArray[index].length > 10 + codeLength) {
             possibleErrors.push(numberArray[index]);
         }
     }
@@ -214,35 +219,4 @@ function toggleDisabled() {
     for (var i = 0; i < billingItems.length; i++) {
         billingItems[i].disabled = !billingItems[i].disabled;
     }
-}
-
-/************************************************************************************************************************************************************************/
-
-/*
-    A switch case used for error checking. Find the correct country code and set the values for maximum
-    number length, minimum number length and the area code. This will help with sanitising the numbers
-    and provide a more accurate prediction of possible errors.
-*/
-function getPhoneNumberLength() {
-    if (currencyCode.length === 0) {
-        return numberLength;
-    }
-
-    switch (currencyCode) {
-        case "GBP":
-            numberLength = {
-                maximum: 12,
-                minimum: 12,
-                code: 44
-            };
-            break;
-        default:
-            numberLength = {
-                maximum: 15,
-                minimum: 9,
-                code: false
-            };
-    }
-
-    return numberLength;
 }

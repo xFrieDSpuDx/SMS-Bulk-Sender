@@ -9,12 +9,8 @@ let sendComplete = true;        // Boolean - True when sending to avoid double s
 let accountBalance = 0;         // Current Telnyx account balance
 let successTotal = 0;           // Counter for successfully sent messages
 let errorTotal = 0;             // Counter for failed messages
-let numberLength = {            // Number length object for error checking
-    maximum: 14,
-    minimum: 8,
-    code: false
-};
-let partialSendArray = [];    // If the browser crashed while sending the cookie will repopulate this array
+let partialSendArray = [];      // If the browser crashed while sending the cookie will repopulate this array
+let internationalCode = "";     // The international code taken from the send from number
 const apiURL = {                // API details
     balance: "https://api.telnyx.com/v2/balance",
     message: "https://api.telnyx.com/v2/messages"
@@ -48,11 +44,11 @@ document.getElementById("phoneNumberInput").onkeyup = function () {
 };
 
 document.getElementById("telnyxSendFrom").onchange = function () {
-    telnyxSendFromChange();
+    telnyxSendFromChange(this.value);
 };
 
 document.getElementById("telnyxSendFrom").onkeyup = function () {
-    telnyxSendFromChange();
+    telnyxSendFromChange(this.value);
 };
 
 document.getElementById("apiKey").onchange = function () {
@@ -75,7 +71,9 @@ function phoneNumberInputChange() {
     startPhoneNumberCheck();
 }
 
-function telnyxSendFromChange() {
+function telnyxSendFromChange(sendFromNumber) {
+    document.getElementById("sendErrors").innerHTML = "";
+    internationalCode = sendFromNumber.slice(0,-10);
 }
 
 /*

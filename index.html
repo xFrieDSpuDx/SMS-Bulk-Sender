@@ -10,88 +10,91 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
     <link href="style/style.css" rel="stylesheet" type="text/css" />
 </head>
-<main>
-    <div class="hero__container bg--black hero__container--page">
-        <div class="hero__image hero__image--overlay">
-            <picture>
-                <img src="style/sms-header.webp" alt=""/>
-            </picture>
-        </div>
-        <div class="hero__content hero__content--left">
-            <div class="hero__content__inner container hero__content__inner--left">
-                <h1>Bulk SMS</h1>
-                <h2>Send loads of texts with a single click</h2>
+<div id="app" data-v-app="">
+    <main>
+        <div class="hero__container bg--black hero__container--page">
+            <div class="hero__image hero__image--overlay">
+                <picture>
+                    <img src="style/sms-header.webp" alt="" />
+                </picture>
+            </div>
+            <div class="hero__content hero__content--left">
+                <div class="hero__content__inner container hero__content__inner--left">
+                    <h1>Bulk SMS</h1>
+                    <h2>Send loads of texts with a single click</h2>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="services__body">
-        <div class="content-block">
-            <div class="content-block__wrapper  ">
-                <div class="content-block__image">
-                    <picture>
-                        <img src="style/social-messages.svg" alt=""/>
-                    </picture>
-                </div>
-                <div class="content-block__text">
-                    <h2 class="content-block__heading ">Complete the form to send your texts</h2>
-                    <div class="content-block__body ">
-                        <p>Send messages with your Telnyx account by following these steps:</p>
-                        <ul>
-                            <li>Paste in your API key</li>
-                            <li>Paste in your Telnyx mobile number</li>
-                            <li>Paste* your list of numbers including country code. E.g. +447123456789</li>
-                            <li>Write your message and press "Send SMS"</li>
-                            <br>
-                            <br>
-                            <p>*Or Drag and drop a text file of numbers into the Phone Number List box.</p>
-                        </ul>
+        <div class="services__body">
+            <div class="content-block">
+                <div class="content-block__wrapper  ">
+                    <div class="content-block__image">
+                        <picture>
+                            <img src="style/social-messages.svg" alt="" />
+                        </picture>
+                    </div>
+                    <div class="content-block__text">
+                        <h2 class="content-block__heading ">Complete the form to send your texts</h2>
+                        <div class="content-block__body ">
+                            <p>Send messages with your Telnyx account by following these steps:</p>
+                            <ul>
+                                <li>Paste in your API key</li>
+                                <li>Paste in your Telnyx mobile number</li>
+                                <li>Paste* your list of numbers including country code. E.g. +447123456789</li>
+                                <li>Write your message and press "Send SMS"</li>
+                                <br>
+                                <br>
+                                <p>*Or Drag and drop a text file of numbers into the Phone Number List box.</p>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div id="smsInputForm" class="content-block">
-            <div class="content-block__wrapper">
-                <div class="content-block__text sms-numbers">
-                    <h2 class="content-block__heading ">Let's get texting</h2>
-                    <div class="contact-form__body contact-form__body__no__border">
-                        <div class="form__section">
-                            <div class="inputTitle">Phone Number List:
-                                <label id="totalNumbers"></label>
+            <div id="smsInputForm" class="content-block">
+                <div class="content-block__wrapper">
+                    <div class="content-block__text sms-numbers">
+                        <h2 class="content-block__heading ">Let's get texting</h2>
+                        <div class="contact-form__body contact-form__body__no__border">
+                            <div class="form__section">
+                                <div class="inputTitle">Phone Number List:
+                                    <label id="totalNumbers"></label>
+                                </div>
+                                <textarea class="fullwidth_textarea fullheight_textarea"
+                                    placeholder="Populate with phone numbers including country code. E.g. +447123456789"
+                                    id="phoneNumberInput" ondragover="onDragOverHandler(event)"
+                                    ondrop="onFilesDropHandler(event)"
+                                    ondragleave="onDragLeaveHandler(event)"></textarea>
                             </div>
-                            <textarea class="fullwidth_textarea fullheight_textarea"
-                                placeholder="Populate with phone numbers including country code. E.g. +447123456789"
-                                id="phoneNumberInput" ondragover="onDragOverHandler(event)"
-                                ondrop="onFilesDropHandler(event)" ondragleave="onDragLeaveHandler(event)"></textarea>
+                            <div id="accountBalance" class="sms-error-output"></div>
+                            <div id="sentMessages" class="sms-error-output"></div>
+                            <div id="sendErrors" class="sms-error-output"></div>
+                            <div id="duplicateNumbers" class="sms-error-output"></div>
                         </div>
-                        <div id="accountBalance" class="sms-error-output"></div>
-                        <div id="sentMessages" class="sms-error-output"></div>
-                        <div id="sendErrors" class="sms-error-output"></div>
-                        <div id="duplicateNumbers" class="sms-error-output"></div>
                     </div>
-                </div>
-                <div class="content-block__text sms-numbers-right">
-                    <div class="contact-form__body contact-form__body__no__border">
-                        <div class="form__section">
-                            <div class="inputTitle">Telnyx API Key:</div>
-                            <input type="text" id="apiKey" placeholder="Telnyx API Key" value="">
-                            <div class="inputTitle">Telnyx Mobile Number:</div>
-                            <input type="text" id="telnyxSendFrom" placeholder="Telnyx Mobile Number" value="">
-                            <div class="inputTitle">SMS Message:</div>
-                            <textarea class="fullwidth_textarea" placeholder="SMS Message"
-                                id="textMessageInput"></textarea>
-                        </div>
-                        <div id="characterCount">Character Count: 0</div>
-                        <div id="smsCount">SMS Messages: 0</div>
-                        <div class="content-simple__button"><a class="button button--primary" href="javascript:void(0);"
-                                onclick="sendSMS();">Send SMS</a>
-                            <div id="sendInProgress" class="send-in-progress"></div>
+                    <div class="content-block__text sms-numbers-right">
+                        <div class="contact-form__body contact-form__body__no__border">
+                            <div class="form__section">
+                                <div class="inputTitle">Telnyx API Key:</div>
+                                <input type="text" id="apiKey" placeholder="Telnyx API Key" value="">
+                                <div class="inputTitle">Telnyx Mobile Number:</div>
+                                <input type="text" id="telnyxSendFrom" placeholder="Telnyx Mobile Number" value="">
+                                <div class="inputTitle">SMS Message:</div>
+                                <textarea class="fullwidth_textarea" placeholder="SMS Message"
+                                    id="textMessageInput"></textarea>
+                            </div>
+                            <div id="characterCount">Character Count: 0</div>
+                            <div id="smsCount">SMS Messages: 0</div>
+                            <div class="content-simple__button"><a class="button button--primary"
+                                    href="javascript:void(0);" onclick="sendSMS();">Send SMS</a>
+                                <div id="sendInProgress" class="send-in-progress"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
+</div>
 <!-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         // check for existing cookies
