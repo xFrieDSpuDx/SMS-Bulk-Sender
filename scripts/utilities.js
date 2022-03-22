@@ -106,12 +106,12 @@ function fixCountryCode(sanitisedNumbers) {
     let countryCodeCorrected = [];
 
     for (let index = 0; index < sanitisedNumbers.length; index++) {
+        if (sanitisedNumbers[index].substring(0, 1) == 0) {
+            sanitisedNumbers[index] = sanitisedNumbers[index].slice(1);
+        }
+
         if (sanitisedNumbers[index].substring(0, countryCodeLength - 1) !== String(internationalCode.substring(1))) {
-            if (sanitisedNumbers[index].length < 10) {
-                countryCodeCorrected.push(internationalCode + sanitisedNumbers[index]);
-            } else {
-                countryCodeCorrected.push(internationalCode + sanitisedNumbers[index].slice(sanitisedNumbers[index].length - 10));
-            }
+            countryCodeCorrected.push(internationalCode + sanitisedNumbers[index]);
         } else {
             countryCodeCorrected.push("+" + sanitisedNumbers[index]);
         }
