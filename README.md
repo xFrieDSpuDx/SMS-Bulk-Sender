@@ -6,3 +6,10 @@ To try this out before self hosting use https://sms.lily-pad.uk where this code 
 
 Install:
 Configure a webserver and copy the contents of this repository into the directory.
+
+TODO:
+More comprehensive error handling
+Enable send all function to speed up message sending
+Fix CSS on mobile devices
+Enable store details in cookies
+Enable resume sending if the page is closed before all numbers are messaged
