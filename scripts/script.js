@@ -129,6 +129,11 @@ function startPhoneNumberCheck() {
     document.getElementById("duplicateNumbers").innerHTML = "";
     document.getElementById("sentMessages").innerHTML = "";
     document.getElementById("totalNumbers").innerHTML = "";
+
+    if (document.getElementById("phoneNumberInput").value == "") {
+        return;
+    }
+    
     const numberArray = cleanNumbersReturnArray(document.getElementById("phoneNumberInput").value);
     const totalNumbers = numberArray.length;
 
