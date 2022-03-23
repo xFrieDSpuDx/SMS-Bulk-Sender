@@ -164,7 +164,7 @@ function checkNumberLength(numberArray) {
 
     if (codeLength === 0) {
         document.getElementById("sendErrors").innerHTML = "Error: Populate the Telnyx Mobile Number to allow error checking on the phone number list.";
-        return;
+        return possibleErrors;
     }
 
     for (let index = 0; index < numberArray.length; index++) {
