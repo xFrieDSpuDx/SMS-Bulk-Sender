@@ -74,11 +74,29 @@
                     </div>
                     <div class="content-block__text sms-numbers-right">
                         <div class="contact-form__body contact-form__body__no__border">
+                            <div>
+                                <label class="form-check-control">
+                                    <input type="checkbox" id="alphanumericCheck" name="alphanumericCheck"
+                                        onclick="toggleAlphanumericSMS();" />
+                                    Alphanumeric SMS (Extra costs apply)
+                                </label>
+                            </div>
                             <div class="form__section">
                                 <div class="inputTitle">Telnyx API Key:</div>
                                 <input type="text" id="apiKey" placeholder="Telnyx API Key" value="">
-                                <div class="inputTitle">Telnyx Mobile Number:</div>
-                                <input type="text" id="telnyxSendFrom" placeholder="Telnyx Mobile Number" value="">
+                                <div id="numberInput">
+                                    <div class="inputTitle">Telnyx Mobile Number:</div>
+                                    <input type="text" id="telnyxSendFrom" placeholder="Telnyx Mobile Number" value="">
+                                </div>
+                                <div id="alphanumericInput" style="display: none;">
+                                    <div class="inputTitle">Alphanumeric Name:</div>
+                                    <input type="text" id="telnyxAlphanumericName"
+                                        onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g, '')" maxlength="11"
+                                        placeholder="Alphanumeric Name up to 11 Characters" value="">
+                                    <div class="inputTitle">Telnyx Messaging Profile:</div>
+                                    <input type="text" id="telnyxMessagingProfile"
+                                        placeholder="Telnyx Messaging Profile" value="">
+                                </div>
                                 <div class="inputTitle">SMS Message:</div>
                                 <textarea class="fullwidth_textarea" placeholder="SMS Message"
                                     id="textMessageInput"></textarea>
