@@ -1,3 +1,24 @@
+/*
+    Populate the data object and return a stringified version
+*/
+function populateData(postDetails, index) {
+    let dataObject = {
+        "to": postDetails.numberArray[index],
+        "text": postDetails.smsMessage
+    }
+
+    const alphanumbericCheck = document.getElementById("alphanumericCheck");
+
+    if (alphanumbericCheck.checked) {
+        dataObject.from = postDetails.alphaNumbericName;
+        dataObject.messaging_profile_id = postDetails.messagingProfile;
+    } else {
+        dataObject.from = postDetails.telnyxNumber;
+    }
+
+    return JSON.stringify(dataObject);
+}
+
 /* 
     This version of the post message function will send one message
     at a time. It will verify the API has received the message before sending the next.
@@ -8,11 +29,7 @@ function sendSMSSynchronous(postDetails, numberArrayLength, index) {
         return;
     }
 
-    const data = JSON.stringify({
-        "from": postDetails.telnyxNumber,
-        "to": postDetails.numberArray[index],
-        "text": postDetails.smsMessage
-    });
+    const data = populateData(postDetails, index);
     let xhr = new XMLHttpRequest();
 
     xhr.open("POST", apiURL.message);
@@ -59,12 +76,7 @@ function sendSMSAsync(postDetails, numberArrayLength) {
             break;
         }
 
-        let data = JSON.stringify({
-            "from": postDetails.telnyxNumber,
-            "to": postDetails.numberArray[index],
-            "text": postDetails.smsMessage
-        });
-
+        const data = populateData(postDetails);
         let xhr = new XMLHttpRequest();
 
         xhr.open("POST", apiURL.message);
