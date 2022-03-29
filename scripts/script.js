@@ -1,17 +1,17 @@
 /*
     Global variables
 */
-let successArray = [];          // An array of numbers that successfully received the message
-let sendCost = 0;               // Cumulative cost of sent messages
-let currencyCode = "";          // Currency code for the country of the Telnyx API account
-let emergencyStop = false;      // Boolean - If there is an error stop sending further messages
-let sendComplete = true;        // Boolean - True when sending to avoid double sends
-let accountBalance = 0;         // Current Telnyx account balance
-let successTotal = 0;           // Counter for successfully sent messages
-let errorTotal = 0;             // Counter for failed messages
-let partialSendArray = [];      // If the browser crashed while sending the cookie will repopulate this array
-let internationalCode = "";     // The international code taken from the send from number
-const apiURL = {                // API details
+let successArray = []; // An array of numbers that successfully received the message
+let sendCost = 0; // Cumulative cost of sent messages
+let currencyCode = ""; // Currency code for the country of the Telnyx API account
+let emergencyStop = false; // Boolean - If there is an error stop sending further messages
+let sendComplete = true; // Boolean - True when sending to avoid double sends
+let accountBalance = 0; // Current Telnyx account balance
+let successTotal = 0; // Counter for successfully sent messages
+let errorTotal = 0; // Counter for failed messages
+let partialSendArray = []; // If the browser crashed while sending the cookie will repopulate this array
+let internationalCode = ""; // The international code taken from the send from number
+const apiURL = { // API details
     balance: "https://api.telnyx.com/v2/balance",
     message: "https://api.telnyx.com/v2/messages"
 };
@@ -73,7 +73,24 @@ function phoneNumberInputChange() {
 
 function telnyxSendFromChange(sendFromNumber) {
     document.getElementById("sendErrors").innerHTML = "";
-    internationalCode = sendFromNumber.slice(0,-10);
+    internationalCode = sendFromNumber.slice(0, -10);
+}
+
+/*
+    This function toggles the visibility of div elements based on a checkbox value
+*/
+function toggleAlphanumericSMS() {
+    const alphanumbericCheck = document.getElementById("alphanumericCheck");
+
+    if (alphanumbericCheck.checked) {
+        const alphanumbericInput = document.getElementById("alphanumericInput");
+
+        alphanumbericInput.style.display = "block";
+    } else {
+        const alphanumbericInput = document.getElementById("alphanumericInput");
+
+        alphanumbericInput.style.display = "none";
+    }
 }
 
 /*
@@ -93,6 +110,8 @@ function sendSMS() {
         smsMessage: document.getElementById("textMessageInput").value,
         apiKey: document.getElementById("apiKey").value,
         telnyxNumber: document.getElementById("telnyxSendFrom").value,
+        alphaNumbericName: document.getElementById("telnyxAlphanumericName").value,
+        messagingProfile: document.getElementById("telnyxMessagingProfile").value,
         numberArray: numbersToSendTo,
     };
     const numberArrayLength = postDetails.numberArray.length;
@@ -133,7 +152,7 @@ function startPhoneNumberCheck() {
     if (document.getElementById("phoneNumberInput").value == "") {
         return;
     }
-    
+
     const numberArray = cleanNumbersReturnArray(document.getElementById("phoneNumberInput").value);
     const totalNumbers = numberArray.length;
 
@@ -156,7 +175,7 @@ function sendSuccess(response) {
     if (sanitisedResponse.data.cost.amount === null) {
         return;
     }
-    
+
     sendCost += parseFloat(sanitisedResponse.data.cost.amount);
     successArray.push(successNumber);
 }
