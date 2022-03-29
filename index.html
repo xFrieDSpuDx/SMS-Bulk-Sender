@@ -91,7 +91,7 @@
                                 <div id="alphanumericInput" style="display: none;">
                                     <div class="inputTitle">Alphanumeric Name:</div>
                                     <input type="text" id="telnyxAlphanumericName"
-                                        onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g, '')" maxlength="11"
+                                        onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g, '')" maxlength="11"
                                         placeholder="Alphanumeric Name up to 11 Characters" value="">
                                     <div class="inputTitle">Telnyx Messaging Profile:</div>
                                     <input type="text" id="telnyxMessagingProfile"
