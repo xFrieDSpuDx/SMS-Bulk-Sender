@@ -762,6 +762,12 @@ p {
     overflow-wrap: normal;
 }
 
+.sms-error-output-overflow {
+    overflow-wrap: normal;
+    height: 150px;
+    overflow-y: auto;
+}
+
 .content-block__image {
     width: 100%
 }
