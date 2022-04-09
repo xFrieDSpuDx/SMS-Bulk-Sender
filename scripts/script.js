@@ -123,7 +123,7 @@ function sendSMS() {
     }
 
     toggleDisabled();
-    sendSMSSynchronous(postDetails, numberArrayLength, 0);
+    sendSMSAsync(postDetails, numberArrayLength, 0);
 }
 
 /*
