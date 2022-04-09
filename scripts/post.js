@@ -76,7 +76,7 @@ function sendSMSAsync(postDetails, numberArrayLength) {
             break;
         }
 
-        const data = populateData(postDetails);
+        const data = populateData(postDetails, index));
         let xhr = new XMLHttpRequest();
 
         xhr.open("POST", apiURL.message);
@@ -101,7 +101,7 @@ function sendSMSAsync(postDetails, numberArrayLength) {
                 handleErrorMessage(xhr.response, xhr.status, numberArrayLength);
             }
 
-            if (index === numberArrayLength - 1) {
+            if (numberArrayLength === (successTotal + errorTotal)) {
                 displayComplete();
             }
         };
