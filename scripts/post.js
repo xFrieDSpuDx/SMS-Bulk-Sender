@@ -76,7 +76,7 @@ function sendSMSAsync(postDetails, numberArrayLength) {
             break;
         }
 
-        const data = populateData(postDetails, index));
+        const data = populateData(postDetails, index);
         let xhr = new XMLHttpRequest();
 
         xhr.open("POST", apiURL.message);
