@@ -1,3 +1,5 @@
+let unableToSanitise = [];
+
 /*
     As SMS does not necessarily count a single character as one when sending it's
     important to know exactly how many characters a message can contain before
@@ -102,19 +104,36 @@ function onDragLeaveHandler(event) {
     If possible fix any possible errors in the country code before trying to send
 */
 function fixCountryCode(sanitisedNumbers) {
+    unableToSanitise = [];
     const countryCodeLength = String(internationalCode).length;
     let countryCodeCorrected = [];
+    let includesCountryCode = false;
 
     for (let index = 0; index < sanitisedNumbers.length; index++) {
+        if (sanitisedNumbers[index] === "+") {
+            includesCountryCode = true;
+            continue;
+        }
+        
+        if (includesCountryCode === true) {
+            includesCountryCode = false;
+            countryCodeCorrected.push("+" + sanitisedNumbers[index]);
+            continue;
+        }
+        
+        if (sanitisedNumbers[index].substring(0, 2) == "00") {
+            sanitisedNumbers[index] = sanitisedNumbers[index].slice(2);
+            countryCodeCorrected.push("+" + sanitisedNumbers[index]);
+            continue;
+        }
+        
         if (sanitisedNumbers[index].substring(0, 1) == 0) {
             sanitisedNumbers[index] = sanitisedNumbers[index].slice(1);
-        }
-
-        if (sanitisedNumbers[index].substring(0, countryCodeLength - 1) !== String(internationalCode.substring(1))) {
             countryCodeCorrected.push(internationalCode + sanitisedNumbers[index]);
-        } else {
-            countryCodeCorrected.push("+" + sanitisedNumbers[index]);
+            continue;
         }
+        
+        unableToSanitise.push(sanitisedNumbers[index]);
     }
 
     return countryCodeCorrected;
@@ -130,7 +149,8 @@ function cleanNumbersReturnArray(numberInput) {
     }
 
     let sanitisedNumbers = numberInput.replace(/[^0-9+\n,]/g, "");
-    sanitisedNumbers = sanitisedNumbers.split(/[ +\n,]+/);
+    sanitisedNumbers = sanitisedNumbers.split(/(?=\+)(\+)|[ \n\r,]/g);
+    sanitisedNumbers = sanitisedNumbers.filter(item => item);
     sanitisedNumbers = fixCountryCode(sanitisedNumbers);
 
     sanitisedNumbers = sanitisedNumbers.filter(arrayValue => arrayValue !== String(internationalCode));
@@ -148,10 +168,16 @@ function cleanNumbersReturnArray(numberInput) {
 function checkForNumberErrors(numberArray) {
     const possibleErrorNumbers = checkNumberLength(numberArray);
     const numberOfErrors = possibleErrorNumbers.length;
+    const numberOfMissingCountryCodes = unableToSanitise.length;
 
     if (numberOfErrors !== 0) {
         document.getElementById("sendErrors").innerHTML = "<b>" + numberOfErrors + " number(s) with errors</b>";
         populateFinalErrorMessage(possibleErrorNumbers, "sendErrors");
+    }
+    
+    if (numberOfMissingCountryCodes !== 0) {
+        document.getElementById("missingCountryCodeErrors").innerHTML = "<b>" + numberOfMissingCountryCodes + " number(s) missing country prefix</b>";
+        populateFinalErrorMessage(unableToSanitise, "missingCountryCodeErrors");
     }
 }
 
@@ -168,7 +194,7 @@ function checkNumberLength(numberArray) {
     }
 
     for (let index = 0; index < numberArray.length; index++) {
-        if (numberArray[index].length < 10 + codeLength || numberArray[index].length > 10 + codeLength) {
+        if (numberArray[index].length < 11 || numberArray[index].length > 10 + codeLength) {
             possibleErrors.push(numberArray[index]);
         }
     }
