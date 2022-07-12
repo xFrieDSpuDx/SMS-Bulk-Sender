@@ -145,6 +145,7 @@ function resetVariables() {
 */
 function startPhoneNumberCheck() {
     document.getElementById("sendErrors").innerHTML = "";
+    document.getElementById("missingCountryCodeErrors").innerHTML = "";
     document.getElementById("duplicateNumbers").innerHTML = "";
     document.getElementById("sentMessages").innerHTML = "";
     document.getElementById("totalNumbers").innerHTML = "";
