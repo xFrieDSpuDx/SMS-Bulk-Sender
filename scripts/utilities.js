@@ -194,7 +194,7 @@ function checkNumberLength(numberArray) {
     }
 
     for (let index = 0; index < numberArray.length; index++) {
-        if (numberArray[index].length < 11 || numberArray[index].length > 10 + codeLength) {
+        if (numberArray[index].length < 11 || numberArray[index].length > 11 + codeLength) {
             possibleErrors.push(numberArray[index]);
         }
     }
