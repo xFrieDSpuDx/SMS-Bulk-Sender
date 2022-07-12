@@ -764,8 +764,10 @@ p {
 
 .sms-error-output-overflow {
     overflow-wrap: normal;
-    height: 150px;
+    max-height: 150px;
     overflow-y: auto;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .content-block__image {
