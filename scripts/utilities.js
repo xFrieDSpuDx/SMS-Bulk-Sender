@@ -194,7 +194,15 @@ function checkNumberLength(numberArray) {
     }
 
     for (let index = 0; index < numberArray.length; index++) {
-        if (numberArray[index].length < 11 || numberArray[index].length > 11 + codeLength) {
+        if (numberArray[index].length <= 4) {
+            possibleErrors.push(numberArray[index]);
+            continue;
+        }
+        
+        const numberDetails = window.libphonenumber.parsePhoneNumber(numberArray[index]);        
+        const numberValidStatus = numberDetails.isValid();
+
+        if (!numberValidStatus) {
             possibleErrors.push(numberArray[index]);
         }
     }
