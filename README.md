@@ -14,7 +14,5 @@ Configure a webserver and copy the contents of this repository into the director
 Latest Commit Functionality:</br>
 Fixed the asynchronous send function to dramatically improve message send performance. The website will now send messages as quickly as the browser can send post requests. The interface will stay locked out until all post requests have had a response of any type.</br></br>
 TODO:</br>
-Allow sending to numbers with country codes that differ from the Telnyx send number's country code</br>
-More comprehensive error handling</br>
 Enable store details in cookies</br>
 Enable resume sending if the page is closed before all numbers are messaged
