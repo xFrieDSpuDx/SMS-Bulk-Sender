@@ -104,10 +104,13 @@ function onDragLeaveHandler(event) {
     If possible fix any possible errors in the country code before trying to send
 */
 function fixCountryCode(sanitisedNumbers) {
-    unableToSanitise = [];
+    const twoDigitPrefix = ["00", "10"];
+    const threeDigitPrefix = ["001", "002", "005", "007", "008", "009",  "011", "012", "013", "014", "119", "810"];
+    const nationalDigitPrefix = ["0", "1", "6", "8"];
     const countryCodeLength = String(internationalCode).length;
     let countryCodeCorrected = [];
     let includesCountryCode = false;
+    unableToSanitise = [];
 
     for (let index = 0; index < sanitisedNumbers.length; index++) {
         if (sanitisedNumbers[index] === "+") {
@@ -121,13 +124,19 @@ function fixCountryCode(sanitisedNumbers) {
             continue;
         }
         
-        if (sanitisedNumbers[index].substring(0, 2) == "00") {
+        if (threeDigitPrefix.indexOf(sanitisedNumbers[index].substring(0, 3)) !== -1) {
+            sanitisedNumbers[index] = sanitisedNumbers[index].slice(3);
+            countryCodeCorrected.push("+" + sanitisedNumbers[index]);
+            continue;
+        }
+        
+        if (twoDigitPrefix.indexOf(sanitisedNumbers[index].substring(0, 2)) !== -1) {
             sanitisedNumbers[index] = sanitisedNumbers[index].slice(2);
             countryCodeCorrected.push("+" + sanitisedNumbers[index]);
             continue;
         }
         
-        if (sanitisedNumbers[index].substring(0, 1) == 0) {
+        if (nationalDigitPrefix.indexOf(sanitisedNumbers[index].substring(0, 1)) !== -1) {
             sanitisedNumbers[index] = sanitisedNumbers[index].slice(1);
             countryCodeCorrected.push(internationalCode + sanitisedNumbers[index]);
             continue;

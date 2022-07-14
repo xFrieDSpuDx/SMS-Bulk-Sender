@@ -157,7 +157,7 @@ function startPhoneNumberCheck() {
     const numberArray = cleanNumbersReturnArray(document.getElementById("phoneNumberInput").value);
     const totalNumbers = numberArray.length;
 
-    if (totalNumbers === 0) {
+    if (totalNumbers === 0 && unableToSanitise.length === 0) {
         return;
     }
 
