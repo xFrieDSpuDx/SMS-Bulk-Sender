@@ -1,5 +1,3 @@
-let unableToSanitise = [];
-
 /*
     As SMS does not necessarily count a single character as one when sending it's
     important to know exactly how many characters a message can contain before
@@ -9,6 +7,10 @@ let unableToSanitise = [];
 */
 
 function calculateTextMessage(characters) {
+    if (characters === 0) {
+        return 0;
+    }
+    
     let numberOfMessages = 1;
 
     if (Number(characters) > 160) {
@@ -57,16 +59,13 @@ async function onFilesDropHandler(event) {
         return;
     }
 
-    let files = event.dataTransfer.files;
+    const selectedFile = event.dataTransfer.files[0];
+    let reader = new FileReader();
 
-    for (let index = 0, selectedFile; selectedFile = files[index]; index++) {
-        let reader = new FileReader();
-
-        reader.readAsText(selectedFile);
-        reader.onload = function () {
-            document.getElementById("phoneNumberInput").value = reader.result;
-        };
-    }
+    reader.readAsText(selectedFile);
+    reader.onload = function () {
+        document.getElementById("phoneNumberInput").value = reader.result;
+    };
 
     await delay(200);
     phoneNumberInputChange();
@@ -174,45 +173,81 @@ function cleanNumbersReturnArray(numberInput) {
     Pre-empt possible errors. Check the input numbers for known errors and report
     to the user before they send any messages
 */
-function checkForNumberErrors(numberArray) {
-    const possibleErrorNumbers = checkNumberLength(numberArray);
-    const numberOfErrors = possibleErrorNumbers.length;
+function checkForNumberErrors(numbersToSendSMS) {
+    // Reset error messages
+    document.getElementById("invalidNumbers").classList.add("hide-element");
+    document.getElementById("missingCountryCodeErrors").classList.add("hide-element");
+    document.getElementById("duplicateNumbers").classList.add("hide-element");
+    
+    const totalNumbers = numbersToSendSMS.length;
+    invalidNumbers = checkNumberLength(numbersToSendSMS);
+    const numberOfErrors = invalidNumbers.length;
     const numberOfMissingCountryCodes = unableToSanitise.length;
+    
+    const totalErrorsFound = (numberOfErrors + numberOfMissingCountryCodes + duplicateNumbersArray.length);
+    
+    if (totalErrorsFound === 0) {
+        document.getElementById("phoneNumberInput").classList.remove("form__section-error");
+        document.getElementById("phoneNumberInput").classList.remove("form__section-some-error");
+        document.getElementById("totalErrors").innerHTML = "<b>" + totalErrorsFound + "</b> errors found in the input numbers.";
+        
+        updateNavigationStatus("step2", "numberList", true);
+        
+        return;
+    }
 
+    /*
+        Populate messages and update UI to show errors
+    */
     if (numberOfErrors !== 0) {
-        document.getElementById("sendErrors").innerHTML = "<b>" + numberOfErrors + " number(s) with errors</b>";
-        populateFinalErrorMessage(possibleErrorNumbers, "sendErrors");
+        populateNumberErrors(invalidNumbers, "invalidNumbers");
     }
     
     if (numberOfMissingCountryCodes !== 0) {
-        document.getElementById("missingCountryCodeErrors").innerHTML = "<b>" + numberOfMissingCountryCodes + " number(s) missing country prefix</b>";
-        populateFinalErrorMessage(unableToSanitise, "missingCountryCodeErrors");
+        populateNumberErrors(unableToSanitise, "missingCountryCodeErrors");
+    }
+    
+    if (totalErrorsFound === 1) {
+        document.getElementById("totalErrors").innerHTML = "<b>" + totalErrorsFound + "</b> error found in the input numbers.";
+    } else {
+        document.getElementById("totalErrors").innerHTML = "<b>" + totalErrorsFound + "</b> errors found in the input numbers.";
+    }
+    
+    if (totalNumbers - totalErrorsFound !== 0) {
+        updateNavigationStatus("step2", "numberList", true);
+        
+        document.getElementById("phoneNumberInput").classList.add("form__section-some-error");
+        document.getElementById("phoneNumberInput").classList.remove("form__section-error");
+    }
+    
+    if (totalNumbers === totalErrorsFound) {
+        document.getElementById("phoneNumberInput").classList.add("form__section-error");
+        document.getElementById("phoneNumberInput").classList.remove("form__section-some-error");
     }
 }
 
 /*
     Check the phone number lengths for possible errors
 */
-function checkNumberLength(numberArray) {
+function checkNumberLength(numbersToSendSMS) {
     let possibleErrors = [];
     const codeLength = internationalCode.length;
 
     if (codeLength === 0) {
-        document.getElementById("sendErrors").innerHTML = "Error: Populate the Telnyx Mobile Number to allow error checking on the phone number list.";
         return possibleErrors;
     }
 
-    for (let index = 0; index < numberArray.length; index++) {
-        if (numberArray[index].length <= 4) {
-            possibleErrors.push(numberArray[index]);
+    for (let index = 0; index < numbersToSendSMS.length; index++) {
+        if (numbersToSendSMS[index].length <= 4) {
+            possibleErrors.push(numbersToSendSMS[index]);
             continue;
         }
         
-        const numberDetails = window.libphonenumber.parsePhoneNumber(numberArray[index]);        
+        const numberDetails = window.libphonenumber.parsePhoneNumber(numbersToSendSMS[index]);
         const numberValidStatus = numberDetails.isValid();
 
         if (!numberValidStatus) {
-            possibleErrors.push(numberArray[index]);
+            possibleErrors.push(numbersToSendSMS[index]);
         }
     }
 
@@ -223,9 +258,9 @@ function checkNumberLength(numberArray) {
     Find duplicate numbers in the number input.
     Avoid double sending messages and extra costs where not needed
 */
-function checkForDuplicateNumbers(numberArray) {
-    const set = new Set(numberArray);
-    const duplicateNumbersArray = numberArray.filter(item => {
+function checkForDuplicateNumbers(numbersToSendSMS) {
+    const set = new Set(numbersToSendSMS);
+    duplicateNumbersArray = numbersToSendSMS.filter(item => {
         if (set.has(item)) {
             set.delete(item);
         } else {
@@ -235,31 +270,65 @@ function checkForDuplicateNumbers(numberArray) {
     const totalDuplicatesFound = duplicateNumbersArray.length;
 
     if (totalDuplicatesFound !== 0) {
-        document.getElementById("duplicateNumbers").innerHTML = "<b>" + totalDuplicatesFound + " duplicate number(s) found</b>";
-        populateFinalErrorMessage(duplicateNumbersArray, "duplicateNumbers");
+        populateNumberErrors(duplicateNumbersArray, "duplicateNumbers");
+        document.getElementById("phoneNumberInput").classList.add("form__section-some-error");
+        
+        if (totalDuplicatesFound === 1) {
+            document.getElementById("totalDuplicates").innerHTML = "Sending to <b>" + totalDuplicatesFound + "</b> duplicate number.";
+        } else {
+            document.getElementById("totalDuplicates").innerHTML = "Sending to <b>" + totalDuplicatesFound + "</b> duplicate numbers.";
+        }
+        document.getElementById("totalDuplicates").classList.remove("hide-element");
+        
+    } else {
+        document.getElementById("totalDuplicates").classList.add("hide-element");
+        document.getElementById("totalDuplicates").innerHTML = "";
     }
 }
 
-/************************************************************************************************************************************************************************/
-
 /*
-    Check against cookies to see if sending was halted halfway through and offer to send the remaining
-*/
-function checkIfNumbersAreSentAlready(cleanedInputNumbers) {
-    return cleanedInputNumbers.filter(x => partialSendArray.indexOf(x) === -1);
+    Create a CSV file from an array and allow download
+*/function createCSVForDownload(arrayToConvert, anchorElement) {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    for (var selectedNumber in arrayToConvert) {
+        csvContent += arrayToConvert[selectedNumber] + "\r\n";
+    }
+    
+    const encodedUri = encodeURI(csvContent);
+    let downloadLink = document.getElementById(anchorElement);
+    
+    downloadLink.setAttribute("href", encodedUri);
+    downloadLink.setAttribute("download", anchorElement + ".csv");
 }
 
-/************************************************************************************************************************************************************************/
+/*
+Create a CSV file from an array and allow download
+*/function createCSVForSendStatusDownload(arrayToConvert, anchorElement) {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    for (var selected in arrayToConvert) {
+        const selectedNumber = arrayToConvert[selected][0];
+        const selectedStatus = arrayToConvert[selected][1];
+        const selectedMessage = arrayToConvert[selected][2];
+        csvContent += selectedNumber + "," + selectedStatus + "," + selectedMessage + "\r\n";
+    }
+    
+    const encodedUri = encodeURI(csvContent);
+    let downloadLink = document.getElementById(anchorElement);
+    
+    downloadLink.setAttribute("href", encodedUri);
+    downloadLink.setAttribute("download", anchorElement + ".csv");
+}
 
 /*
-    Toggle disable form input
+    Build an array with success or error values
 */
-function toggleDisabled() {
-    // Select the billing text fields
-    var billingItems = document.querySelectorAll("#smsInputForm input[type='text'], textarea");
-
-    // Toggle the billing text fields
-    for (var i = 0; i < billingItems.length; i++) {
-        billingItems[i].disabled = !billingItems[i].disabled;
+function createSendCompleteCSVArray (appendToArray, numberArray, sendStatus) {
+    for (var selectedNumber in numberArray) {
+        const valueToAppendToArray = [numberArray[selectedNumber], sendStatus, document.getElementById("textMessageInput").value];
+        appendToArray.push(valueToAppendToArray);
     }
+    
+    return appendToArray;
 }
