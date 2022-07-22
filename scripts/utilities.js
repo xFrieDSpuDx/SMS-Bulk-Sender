@@ -288,7 +288,8 @@ function checkForDuplicateNumbers(numbersToSendSMS) {
 
 /*
     Create a CSV file from an array and allow download
-*/function createCSVForDownload(arrayToConvert, anchorElement) {
+*/
+function createCSVForDownload(arrayToConvert, anchorElement) {
     let csvContent = "data:text/csv;charset=utf-8,";
     
     for (var selectedNumber in arrayToConvert) {
@@ -304,7 +305,8 @@ function checkForDuplicateNumbers(numbersToSendSMS) {
 
 /*
 Create a CSV file from an array and allow download
-*/function createCSVForSendStatusDownload(arrayToConvert, anchorElement) {
+*/
+function createCSVForSendStatusDownload(arrayToConvert, anchorElement) {
     let csvContent = "data:text/csv;charset=utf-8,";
     
     for (var selected in arrayToConvert) {
@@ -325,8 +327,10 @@ Create a CSV file from an array and allow download
     Build an array with success or error values
 */
 function createSendCompleteCSVArray (appendToArray, numberArray, sendStatus) {
+    const sentMessage = document.getElementById("textMessageInput").value.replace(/\n/g, "\\n");
+    
     for (var selectedNumber in numberArray) {
-        const valueToAppendToArray = [numberArray[selectedNumber], sendStatus, document.getElementById("textMessageInput").value];
+        const valueToAppendToArray = [numberArray[selectedNumber], sendStatus, sentMessage];
         appendToArray.push(valueToAppendToArray);
     }
     
