@@ -444,6 +444,7 @@ function checkNavigationStatus () {
     }
     
     disableAllNavigation();
+    calculateProgress(0);
     let tabIndex = 1;
     
     for (let navStep in disabledNav) {
