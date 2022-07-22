@@ -36,8 +36,8 @@ E.g. +447123456789, John, john@email.com
 
 The message would be written as follows: </br></br>
 
-Hi <column1>!</br>
-To help us keep our records up to date please can you confirm your current email address is <column2>?</br>
+Hi {column1}!</br>
+To help us keep our records up to date please can you confirm your current email address is {column2}?</br>
 Have a great day!</br></br>
 
 This would display to John as:
