@@ -8,31 +8,82 @@ function handleErrorMessage(response, status, numberArrayLength) {
     switch (status) {
         case 401:
             emergencyStop = true;
-            document.getElementById("sendErrors").innerHTML = "Error: Authentication failed. Please check your API key.";
+            document.getElementById("confirmationSendingStatus").innerHTML = "Error: Authentication failed. Please check your API key.";
+            
             break;
         case 422:
             emergencyStop = true;
-            document.getElementById("sendErrors").innerHTML = "Error: No message found. Please type a message and try again.";
+            document.getElementById("confirmationSendingStatus").innerHTML = "Error: No message found. Please type a message and try again.";
+            
             break;
         case 400:
-            if (numberArrayLength - 1 === 0) {
-                document.getElementById("sendErrors").innerHTML = "Error: Invalid phone number. Please check your Telnyx number and the send to number, then try again";
+            const errorCode = sanitisedResponse.errors[0].code;
+            const errorTitle = sanitisedResponse.errors[0].title;
+            const errorDetails = sanitisedResponse.errors[0].detail;
+            
+            if (errorCode === "10004") {
+                emergencyStop = true;
+                document.getElementById("confirmationSendingStatus").innerHTML = "Error: " + errorTitle + "<br/>Details: " + errorDetails;
             }
+            
             break;
-        default:
-            document.getElementById("sendErrors").innerHTML = sanitisedResponse.errors.title;
     }
 }
 
 /*
     Build the error list and display the numbers with errors
 */
-function populateFinalErrorMessage(difference, htmlElement) {
-    if (difference.length === 0) {
+function populateNumberErrors(errorArray, htmlElement) {
+    const errorsFound = errorArray.length;
+    if (errorsFound === 0) {
         return;
     }
+    
+    document.getElementById(htmlElement).classList.remove("hide-element");
+    
+    const mainDiv = document.getElementById(htmlElement);
+    const downloadElement = mainDiv.getElementsByTagName('a')[0].id;
 
-    let displayErrorArray = difference.join(", ");
+    createCSVForDownload(errorArray, downloadElement);
+    
+    switch (htmlElement) {
+        case "duplicateNumbers":
+            if (errorsFound === 1) {
+                document.getElementById("duplicateNumbersText").innerHTML = "<b>" + errorsFound + "</b> Duplicate found";
+            } else {
+                document.getElementById("duplicateNumbersText").innerHTML = "<b>" + errorsFound + "</b> Duplicates found";
+            }
+            
+            break;
+        case "missingCountryCodeErrors":
+            if (errorsFound === 1) {
+                document.getElementById("missingCountryCodeText").innerHTML = "<b>" + errorsFound + "</b> Missing country code";
+            } else {
+                document.getElementById("missingCountryCodeText").innerHTML = "<b>" + errorsFound + "</b> Missing country codes";
+            }
+            
+            break;
+        case "invalidNumbers":
+            if (errorsFound === 1) {
+                document.getElementById("sendErrorsText").innerHTML = "<b>" + errorsFound + "</b> Invalid number";
+            } else {
+                document.getElementById("sendErrorsText").innerHTML = "<b>" + errorsFound + "</b> Invalid numbers";
+            }
+            break;
+    }
+}
 
-    document.getElementById(htmlElement).innerHTML += ": " + displayErrorArray;
+/*
+    Emergency Stop update UI
+*/
+function fatalErrorDetected() {
+    document.getElementById("confirmationSendingIcon").classList.add("hide-element");
+    document.getElementById("confirmationSentIcon").classList.add("hide-element");
+    document.getElementById("confirmationFatalIcon").classList.remove("hide-element");
+    
+    document.getElementById("confirmationSending").innerHTML = "Fatal error detected. Sending Stopped.";
+    document.getElementById("confirmationSuccessNumber").classList.add("hide-element");
+    document.getElementById("confirmationErrorNumber").classList.add("hide-element");
+    document.getElementById("confirmationCosts").classList.add("hide-element");
+    document.getElementById("confirmationNewBalance").classList.add("hide-element");
 }

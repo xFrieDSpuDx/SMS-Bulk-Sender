@@ -5,7 +5,7 @@ function populateData(postDetails, index) {
     let dataObject = {
         "to": postDetails.numberArray[index],
         "text": postDetails.smsMessage
-    }
+    };
 
     const alphanumbericCheck = document.getElementById("alphanumericCheck");
 
@@ -20,57 +20,16 @@ function populateData(postDetails, index) {
 }
 
 /* 
-    This version of the post message function will send one message
-    at a time. It will verify the API has received the message before sending the next.
-*/
-function sendSMSSynchronous(postDetails, numberArrayLength, index) {
-    if (emergencyStop === true) {
-        displayComplete();
-        return;
-    }
-
-    const data = populateData(postDetails, index);
-    let xhr = new XMLHttpRequest();
-
-    xhr.open("POST", apiURL.message);
-    xhr.setRequestHeader("Accept", "application/json");
-    xhr.setRequestHeader("Authorization", "Bearer " + postDetails.apiKey);
-    xhr.setRequestHeader("Content-Type", "application/json");
-
-    xhr.send(data);
-
-    xhr.onload = function () {
-        if (sendComplete === true) {
-            return;
-        }
-
-        if (xhr.status === 200) {
-            successTotal++;
-            document.getElementById("sentMessages").innerHTML = String(successTotal) + " messages sent of " + String(numberArrayLength);
-            sendSuccess(xhr.response);
-        } else {
-            errorTotal++;
-            document.getElementById("sendErrors").innerHTML = "<b>" + String(errorTotal) + " message(s) failed to send</b>";
-            handleErrorMessage(xhr.response, xhr.status, numberArrayLength);
-        }
-
-        if (index === numberArrayLength - 1) {
-            displayComplete();
-            return;
-        }
-
-        index++;
-        sendSMSSynchronous(postDetails, numberArrayLength, index);
-    };
-}
-
-/* 
     This version of the send message function will send them as quickly as possible.
     There is a chance the API may get overwhelmed if too many messages are sent.
 
     This is faster.
 */
 function sendSMSAsync(postDetails, numberArrayLength) {
+    document.getElementById("confirmationSendingIcon").classList.remove("hide-element");
+    document.getElementById("confirmationSentIcon").classList.add("hide-element");
+    document.getElementById("confirmationFatalIcon").classList.add("hide-element");
+    
     for (let index = 0; index < numberArrayLength; index++) {
         if (emergencyStop === true) {
             break;
@@ -87,18 +46,32 @@ function sendSMSAsync(postDetails, numberArrayLength) {
         xhr.send(data);
 
         xhr.onload = function () {
-            if (sendComplete === true) {
-                return;
-            }
-
             if (xhr.status === 200) {
                 successTotal++;
-                document.getElementById("sentMessages").innerHTML = String(successTotal) + " messages sent of " + String(numberArrayLength);
+                
+                if (successTotal === 1) {
+                    document.getElementById("confirmationSuccessNumber").innerHTML = String(successTotal) + " message sent of " + String(numberArrayLength);
+                } else {
+                    document.getElementById("confirmationSuccessNumber").innerHTML = String(successTotal) + " messages sent of " + String(numberArrayLength);
+                }
+                
                 sendSuccess(xhr.response);
             } else {
-                errorTotal++;
-                document.getElementById("sendErrors").innerHTML = "<b>" + String(errorTotal) + " message(s) failed to send</b>";
                 handleErrorMessage(xhr.response, xhr.status, numberArrayLength);
+                
+                if (emergencyStop === true) {
+                    fatalErrorDetected();
+                    
+                    return;
+                }
+                
+                errorTotal++;
+                
+                if (errorTotal === 1) {
+                    document.getElementById("confirmationErrorNumber").innerHTML = "<b>" + String(errorTotal) + "</b> message failed to send";
+                } else {
+                    document.getElementById("confirmationErrorNumber").innerHTML = "<b>" + String(errorTotal) + "</b> messages failed to send";
+                }
             }
 
             if (numberArrayLength === (successTotal + errorTotal)) {
@@ -113,8 +86,6 @@ function sendSMSAsync(postDetails, numberArrayLength) {
 */
 function getAccountInfo() {
     document.getElementById("accountBalance").innerHTML = "";
-    document.getElementById("sendErrors").innerHTML = "";
-    document.getElementById("sentMessages").innerHTML = "";
 
     const apiKey = document.getElementById("apiKey").value;
 
@@ -131,12 +102,16 @@ function getAccountInfo() {
         const sanitisedResponse = JSON.parse(xhr.response);
 
         if (xhr.status === 200) {
+            updateNavigationStatus("step1", "api", true);
             accountBalance = parseFloat(sanitisedResponse.data.balance);
             document.getElementById("accountBalance").innerHTML = "<b>Current balance</b>: " + sanitisedResponse.data.balance + " " + sanitisedResponse.data.currency;
+            document.getElementById("apiKey").classList.remove("form__section-error");
             currencyCode = sanitisedResponse.data.currency;
             startPhoneNumberCheck();
         } else {
-            document.getElementById("accountBalance").innerHTML = "<b>Error</b>: Unable to get account information. Please check your API key and try again.";
+            updateNavigationStatus("step1", "api", false);
+            document.getElementById("apiKey").classList.add("form__section-error");
+            document.getElementById("accountBalance").innerHTML = "";
         }
     };
 }
