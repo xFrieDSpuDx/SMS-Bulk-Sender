@@ -535,6 +535,7 @@ function deleteErrorNumbers(htmlElement) {
         numbersToSendSMS.splice(indexToSplice, 1);
     }
     
+    numbersToSendSMS = numbersToSendSMS.concat(unableToSanitise);
     numberTextArea.value = numbersToSendSMS.join("\n");
     
     phoneNumberInputChange();
