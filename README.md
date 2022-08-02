@@ -28,7 +28,7 @@ There is now a confirmation page showing useful information about what was sent 
 The confirmation page also shows much more useful error messages to help diagnose exactly what went wrong if a fatal error is encountered.</br></br>
 TODO:</br>
 Add functionality to allow for variables in the text message.</br>
-Functionality would be driven from a CSV file used to populate the numbers, the format should be</br></br>
+<del>Functionality would be driven from a CSV file used to populate the numbers, the format should be</br></br>
 
 Number, Variable 1 Text, Variable 2 text....</br></br>
 
@@ -44,4 +44,4 @@ This would display to John as:
 
 Hi John!</br>
 To help us keep our records up to date please can you confirm your current email address is john@email.com?</br>
-Have a great day!</br></br>
+Have a great day!</br></br></del>
